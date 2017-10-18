@@ -56,6 +56,59 @@ namespace SignoffApp
 
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
+
+                var famalies = new List<PersonFamily>
+                {
+                    new PersonFamily
+                    {
+                        LastName = "Garrison",
+                    },
+                    new PersonFamily
+                    {
+                        LastName = "Cartman",
+                    },
+                    new PersonFamily
+                    {
+                        LastName = "McCormick",
+                    },
+                    new PersonFamily
+                    {
+                        LastName = "Broflovski",
+                    },
+                    new PersonFamily
+                    {
+                        LastName = "Marsh",
+                    },
+                };
+                var teachers = new List<PersonTeacher>
+                {
+                    new PersonTeacher {Name = "Ms. Frizzle"},
+                    new PersonTeacher {Name = "Mr. Garrison", Family = famalies[0]},
+                    new PersonTeacher {Name = "Mr. Hat", Family = famalies[0]},
+                };
+                var students = new List<PersonKid>
+                {
+                    new PersonKid {Name = "Arnold", Grade = 2, Teacher = teachers[0]},
+                    new PersonKid {Name = "Phoebe", Grade = 2, Teacher = teachers[0]},
+                    new PersonKid {Name = "Wanda", Grade = 2, Teacher = teachers[0]},
+
+                    new PersonKid {Name = "Eric", Grade = 4, Teacher = teachers[1], Family = famalies[1]},
+                    new PersonKid {Name = "Kenny", Grade = 4, Teacher = teachers[1], Family = famalies[2]},
+                    new PersonKid {Name = "Kyle", Grade = 4, Teacher = teachers[1], Family = famalies[3]},
+                    new PersonKid {Name = "Stan", Grade = 4, Teacher = teachers[1], Family = famalies[4]},
+                };
+
+                context.Person2.AddRange(teachers);
+                context.Person2.AddRange(students);
+                context.SaveChanges();
+
+                var teachersTask = context.Person2.OfType<PersonTeacher>()
+                    .Include(m => m.Students)
+                    .ThenInclude(m => m.Family)
+                    .ThenInclude(m => m.Members)
+                    .ToListAsync();
+
+                //teachersTask.Wait();
             }
         }
     }

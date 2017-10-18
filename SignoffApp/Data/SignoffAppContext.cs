@@ -13,14 +13,31 @@ namespace SignoffApp.Models
         {
         }
 
-        public DbSet<SignoffApp.Models.Person> Person { get; set; }
+        public DbSet<Person> Person { get; set; }
+
+        public DbSet<Person2> Person2 { get; set; }
 
         //public DbSet<Blog> Blogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //modelBuilder.Entity<Blog>().HasOne(e => e.MyBlog).WithOne(e => e.InverseBlog).HasForeignKey<Blog>(e => e.Id);
-            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<PersonTeacher>().HasBaseType<Person2>();
+            modelBuilder.Entity<PersonKid>().HasBaseType<Person2>();
+            modelBuilder.Entity<PersonFamily>();
+
+            modelBuilder.Entity<PersonKid>(entity =>
+            {
+                entity.Property("Discriminator").HasMaxLength(63);
+                entity.HasIndex("Discriminator");
+
+                entity.HasOne(m => m.Teacher)
+                    .WithMany(m => m.Students)
+                    .HasForeignKey(m => m.TeacherId)
+                    .HasPrincipalKey(m => m.Id)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
         }
     }
 }
