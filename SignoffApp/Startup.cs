@@ -53,6 +53,8 @@ namespace SignoffApp
             using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<SignoffAppContext>();
+
+                context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
             }
         }
